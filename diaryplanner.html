@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Life Planner - Plan Your Day, Organize Your Life, Achieve Your Dreams</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind Config for Theme Extension -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            pink: '#FDE2E4',
+                            lavender: '#E2E2FF',
+                            mint: '#E2F0CB',
+                            cream: '#FFF1E6',
+                            rose: '#FFCAD4',
+                            purple: '#B5E2FA',
+                            darkBg: '#12121E',
+                            darkCard: '#1E1E2D',
+                            darkBorder: '#2D2D3F'
+                        },
+                        accent: {
+                            DEFAULT: 'var(--accent-color, #8B5CF6)',
+                            hover: 'var(--accent-hover, #7C3AED)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --accent-color: #8B5CF6;
+            --accent-hover: #7C3AED;
+            --accent-light: #F3E8FF;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+
+        .bg-accent { background-color: var(--accent-color); }
+        .text-accent { color: var(--accent-color); }
+        .border-accent { border-color: var(--accent-color); }
+        .hover\:bg-accent:hover { background-color: var(--accent-color); }
+        .hover\:text-accent:hover { color: var(--accent-color); }
+
+        /* Glassmorphism effects */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .dark .glass {
+            background: rgba(30, 30, 45, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Smooth tab transitions */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Custom Modal Overlay */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-pastel-darkBg dark:text-slate-100 font-sans min-h-screen flex flex-col antialiased transition-colors duration-300">
+
+    <!-- APP CONTAINER -->
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-pastel-darkCard border-r border-slate-200 dark:border-pastel-darkBorder transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col shadow-lg md:shadow-none">
+            <!-- App Brand Header -->
+            <div class="p-5 flex items-center justify-between border-b border-slate-100 dark:border-pastel-darkBorder">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-400 via-pink-400 to-rose-300 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-sparkles text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg text-slate-900 dark:text-white leading-tight">My Life Planner</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Organize & Achieve</p>
+                    </div>
+                </div>
+                <button id="close-sidebar-btn" class="md:hidden text-slate-400 hover:text-slate-600 dark:hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Profile Widget Mini -->
+            <div class="p-4 mx-3 my-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 flex items-center space-x-3">
+                <div class="relative">
+                    <div class="w-10 h-10 rounded-full bg-accent/20 text-accent flex items-center justify-center font-bold text-lg" id="user-avatar-text">
+                        JS
+                    </div>
+                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                </div>
+                <div class="overflow-hidden">
+                    <h4 class="text-sm font-semibold truncate dark:text-white" id="sidebar-user-name">Jane Doe</h4>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 font-medium inline-block" id="user-tier-badge">Free Plan</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+                <a href="#dashboard" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie w-6 text-slate-400 text-base"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#tasks" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="tasks">
+                    <i class="fa-solid fa-list-check w-6 text-slate-400 text-base"></i>
+                    <span>To-Do List</span>
+                </a>
+                <a href="#goals" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="goals">
+                    <i class="fa-solid fa-bullseye w-6 text-slate-400 text-base"></i>
+                    <span>Goal Tracker</span>
+                </a>
+                <a href="#habits" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="habits">
+                    <i class="fa-solid fa-fire w-6 text-slate-400 text-base"></i>
+                    <span>Habit Tracker</span>
+                </a>
+                <a href="#calendar" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="calendar">
+                    <i class="fa-solid fa-calendar-days w-6 text-slate-400 text-base"></i>
+                    <span>Calendar</span>
+                </a>
+                <a href="#study" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="study">
+                    <i class="fa-solid fa-graduation-cap w-6 text-slate-400 text-base"></i>
+                    <span>Study Planner</span>
+                </a>
+                <a href="#budget" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="budget">
+                    <i class="fa-solid fa-wallet w-6 text-slate-400 text-base"></i>
+                    <span>Budget Planner</span>
+                </a>
+                <a href="#journal" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="journal">
+                    <i class="fa-solid fa-book-journal w-6 text-slate-400 text-base"></i>
+                    <span>Notes & Journal</span>
+                </a>
+                <a href="#premium" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors" data-target="premium">
+                    <i class="fa-solid fa-crown w-6 text-amber-500 text-base"></i>
+                    <span>Premium Hub</span>
+                </a>
+                <a href="#settings" class="nav-link flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors" data-target="settings">
+                    <i class="fa-solid fa-gear w-6 text-slate-400 text-base"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <!-- Upgrade Promo Card in Sidebar -->
+            <div class="p-3 m-3 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs shadow-md">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="font-bold text-sm">Upgrade to Pro</span>
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+                <p class="text-purple-100 mb-2">Unlock unlimited goals, PDF exports & priority cloud sync.</p>
+                <button onclick="switchTab('premium')" class="w-full py-1.5 bg-white text-indigo-700 font-semibold rounded-lg hover:bg-purple-50 transition-colors">
+                    View Plans
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTAINER -->
+        <div class="flex-1 flex flex-col overflow-hidden md:ml-64">
+            
+            <!-- TOP NAVBAR -->
+            <header class="bg-white/80 dark:bg-pastel-darkCard/80 backdrop-blur-md border-b border-slate-200 dark:border-pastel-darkBorder h-16 flex items-center justify-between px-4 md:px-8 z-30 sticky top-0">
+                <div class="flex items-center space-x-3">
+                    <button id="open-sidebar-btn" class="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <h2 id="current-page-title" class="text-xl font-bold text-slate-800 dark:text-white capitalize">Dashboard</h2>
+                </div>
+
+                <!-- Right Utility Menu -->
+                <div class="flex items-center space-x-3">
+                    <!-- Quick Action Menu -->
+                    <div class="relative">
+                        <button id="quick-add-btn" class="px-3 py-1.5 bg-accent text-white rounded-xl text-sm font-semibold flex items-center space-x-1 shadow-sm hover:opacity-90 transition-opacity">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                            <span class="hidden sm:inline">Quick Add</span>
+                        </button>
+                    </div>
+
+                    <!-- Theme Dark Mode Toggle -->
+                    <button id="theme-toggle-btn" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="Toggle Light/Dark Theme">
+                        <i class="fa-solid fa-moon text-lg dark:hidden"></i>
+                        <i class="fa-solid fa-sun text-lg hidden dark:block text-amber-400"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN CONTENT DISPLAY AREA -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+                
+                <!-- 1. DASHBOARD MODULE -->
+                <section id="dashboard" class="tab-content active space-y-6">
+                    <!-- Welcome Header & Live Clock -->
+                    <div class="rounded-3xl bg-gradient-to-r from-purple-200 via-pink-100 to-amber-100 dark:from-slate-800 dark:via-purple-950/40 dark:to-slate-900 p-6 md:p-8 border border-white/60 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <span class="px-3 py-1 bg-white/80 dark:bg-slate-800/80 rounded-full text-xs font-semibold text-accent shadow-sm inline-block mb-2">
+                                    <i class="fa-regular fa-sun mr-1"></i> Ready for a productive day?
+                                </span>
+                                <h1 class="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white" id="welcome-message">Good Morning, Jane!</h1>
+                                <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 mt-1 max-w-xl">"Plan Your Day, Organize Your Life, Achieve Your Dreams."</p>
+                            </div>
+                            <!-- Live Digital Clock & Date Widget -->
+                            <div class="bg-white/90 dark:bg-slate-800/90 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/60 text-center min-w-[200px]">
+                                <div class="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white tracking-wider" id="live-clock">10:45:00 AM</div>
+                                <div class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1" id="live-date">Wednesday, Nov 11, 2026</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Quote Widget -->
+                    <div class="p-4 rounded-2xl bg-amber-50/80 dark:bg-slate-800/40 border border-amber-200/60 dark:border-amber-900/30 flex items-center justify-between gap-4">
+                        <div class="flex items-start space-x-3">
+                            <i class="fa-solid fa-quote-left text-amber-400 text-2xl mt-1"></i>
+                            <div>
+                                <p id="quote-text" class="italic text-sm text-slate-700 dark:text-slate-300 font-medium">"Success is the sum of small efforts, repeated day in and day out."</p>
+                                <span id="quote-author" class="text-xs font-semibold text-amber-700 dark:text-amber-400 mt-0.5 block">— Robert Collier</span>
+                            </div>
+                        </div>
+                        <button id="new-quote-btn" class="text-slate-400 hover:text-amber-600 dark:hover:text-amber-300 p-1" title="New Quote">
+                            <i class="fa-solid fa-arrows-rotate text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Summary Stats Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Task Summary -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-pastel-darkCard border border-slate-100 dark:border-pastel-darkBorder shadow-sm">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tasks Done</span>
+                                    <h3 class="text-2xl font-bold dark:text-white mt-1" id="dash-task-count">0 / 0</h3>
+                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-check-double"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                    <span>Completion rate</span>
+                                    <span id="dash-task-pct">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                                    <div id="dash-task-bar" class="bg-accent h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Goals Progress Summary -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-pastel-darkCard border border-slate-100 dark:border-pastel-darkBorder shadow-sm">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Goals</span>
+                                    <h3 class="text-2xl font-bold dark:text-white mt-1" id="dash-goals-count">0</h3>
+                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-300 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-bullseye"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-4"><span class="font-semibold text-emerald-500" id="dash-goals-avg">0%</span> average overall progress</p>
+                        </div>
+
+                        <!-- Habit Streak Summary -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-pastel-darkCard border border-slate-100 dark:border-pastel-darkBorder shadow-sm">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Best Streak</span>
+                                    <h3 class="text-2xl font-bold dark:text-white mt-1" id="dash-streak-count">0 Days</h3>
+                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-fire"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-4">Keep your habits consistent!</p>
+                        </div>
+
+                        <!-- Budget Remaining Summary -->
+                        <div class="p-5 rounded-2xl bg-white dark:bg-pastel-darkCard border border-slate-100 dark:border-pastel-darkBorder shadow-sm">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Net Savings</span>
+                                    <h3 class="text-2xl font-bold dark:text-white mt-1" id="dash-net-balance">$0.00</h3>
+                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-wallet"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-4">This month's liquid balance</p>
+                        </div>
+                    </div>
+
+                    <!-- Productivity Visual & Upcoming Events -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Weekly Chart -->
+                        <div class="lg:col-span-2 p-6 rounded-2xl bg-white dark:bg-pastel-darkCard border border-slate-100 dark:border-pastel-darkBorder shadow-sm">
+                            <h3 class="text-lg font-bold dark:text-white mb-4">Weekly Task Completion Trend</h3>
+                            <div class="h-64 relative">
+                                <canvas id="weeklyProductivityChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Events Widget -->
+                        <div class="p-6 rounded-2xl bg-white dark:bg-pastel-darkCard border border-slate-100 dark:border-pastel-darkBorder shadow-sm flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-bold dark:text-white">Upcoming Events</h3>
+                                    <button onclick="switchTab('calendar')" class="text-xs text-accent font-semibold hover:underline">View All</button>
+                                </div>
+                                <div id="dash-upcoming-events" class="space-y-3 max-h-56 overflow-y-auto">
+                                    <!-- Dynamic elements inserted via JS -->
+                                </div>
+                            </div>
+                            <button onclick="openModal('event-modal')" class="w-full mt-4 py-2 border border-dashed border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold hover:border-accent hover:text-accent transition-colors">
+                                + Add New Event
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. TO-DO LIST MODULE -->
+                <section id="tasks" class="tab-content space-y-6">
+                    <!-- Control Bar -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-pastel-darkCard p-4 rounded-2xl border border-slate-100 dark:border-pastel-darkBorder">
+                        <!-- Filters -->
+                        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                            <select id="task-filter-status" class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium dark:text-white focus:outline-none focus:border-accent">
+                                <option value="all">All Tasks</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                            <select id="task-filter-priority" class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium dark:text-white focus:outline-none focus:border-accent">
+                                <option value="all">All Priorities</option>
+                                <option value="high">High Priority</option>
+                                <option value="medium">Medium Priority</option>
+                                <option value="low">Low Priority</option>
+                            </select>
+                        </div>
+                        <!-- Search & Add Button -->
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <div class="relative w-full sm:w-64">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                                <input type="text" id="task-search-input" placeholder="Search tasks..." class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                            </div>
+                            <button onclick="openTaskModal()" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold whitespace-nowrap hover:opacity-90 transition-opacity">
+                                + Add Task
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tasks List Container -->
+                    <div class="bg-white dark:bg-pastel-darkCard rounded-2xl border border-slate-100 dark:border-pastel-darkBorder overflow-hidden shadow-sm">
+                        <div class="p-4 border-b border-slate-100 dark:border-pastel-darkBorder flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                            <span class="text-xs font-bold text-slate-500 uppercase">Task Details</span>
+                            <span class="text-xs font-bold text-slate-500 uppercase">Actions</span>
+                        </div>
+                        <div id="tasks-list" class="divide-y divide-slate-100 dark:divide-pastel-darkBorder">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. GOAL TRACKER MODULE -->
+                <section id="goals" class="tab-content space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold dark:text-white">Personal Goals</h3>
+                            <p class="text-xs text-slate-500">Track and achieve long-term milestones.</p>
+                        </div>
+                        <button onclick="openModal('goal-modal')" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90 transition-opacity">
+                            + Create Goal
+                        </button>
+                    </div>
+
+                    <div id="goals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Dynamic Goal Cards -->
+                    </div>
+                </section>
+
+                <!-- 4. HABIT TRACKER MODULE -->
+                <section id="habits" class="tab-content space-y-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold dark:text-white">Daily Habits & Routines</h3>
+                            <p class="text-xs text-slate-500">Consistency is the secret to building life-changing habits.</p>
+                        </div>
+                        <button onclick="openModal('habit-modal')" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90 transition-opacity">
+                            + New Habit
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-pastel-darkCard rounded-2xl border border-slate-100 dark:border-pastel-darkBorder p-6 shadow-sm overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr class="border-b border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-400 uppercase">
+                                    <th class="py-3 px-4">Habit Name</th>
+                                    <th class="py-3 px-2 text-center">Mon</th>
+                                    <th class="py-3 px-2 text-center">Tue</th>
+                                    <th class="py-3 px-2 text-center">Wed</th>
+                                    <th class="py-3 px-2 text-center">Thu</th>
+                                    <th class="py-3 px-2 text-center">Fri</th>
+                                    <th class="py-3 px-2 text-center">Sat</th>
+                                    <th class="py-3 px-2 text-center">Sun</th>
+                                    <th class="py-3 px-4 text-center">Streak</th>
+                                    <th class="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="habits-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/60">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 5. INTERACTIVE CALENDAR MODULE -->
+                <section id="calendar" class="tab-content space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-pastel-darkCard p-4 rounded-2xl border border-slate-100 dark:border-pastel-darkBorder">
+                        <div class="flex items-center space-x-4">
+                            <h3 id="calendar-month-year" class="text-xl font-bold dark:text-white">November 2026</h3>
+                            <div class="flex space-x-1">
+                                <button id="cal-prev-btn" class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                </button>
+                                <button id="cal-next-btn" class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick="openModal('event-modal')" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">
+                            + Add Event
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-pastel-darkCard rounded-2xl border border-slate-100 dark:border-pastel-darkBorder p-4 shadow-sm">
+                        <!-- Days of Week Header -->
+                        <div class="grid grid-cols-7 text-center font-semibold text-slate-400 text-xs py-2 border-b border-slate-100 dark:border-slate-800">
+                            <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+                        </div>
+                        <!-- Dynamic Calendar Days Grid -->
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1 pt-2">
+                            <!-- Dynamic Day Cards -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. STUDY PLANNER MODULE -->
+                <section id="study" class="tab-content space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold dark:text-white">Study & Exam Planner</h3>
+                            <p class="text-xs text-slate-500">Track subject hours and prepare for upcoming exams.</p>
+                        </div>
+                        <button onclick="openModal('study-modal')" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">
+                            + Log Study Session
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Subjects & Hours Progress -->
+                        <div class="lg:col-span-2 space-y-4" id="study-subjects-list">
+                            <!-- Dynamic Subject Cards -->
+                        </div>
+                        <!-- Exam Countdown & Target Stats -->
+                        <div class="bg-white dark:bg-pastel-darkCard p-6 rounded-2xl border border-slate-100 dark:border-pastel-darkBorder shadow-sm space-y-4">
+                            <h4 class="font-bold text-base dark:text-white">Upcoming Exams</h4>
+                            <div id="upcoming-exams-list" class="space-y-3">
+                                <!-- Dynamic exam badges -->
+                            </div>
+                            <button onclick="openModal('exam-modal')" class="w-full py-2 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium hover:border-accent hover:text-accent">
+                                + Add Upcoming Exam
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. BUDGET PLANNER MODULE -->
+                <section id="budget" class="tab-content space-y-6">
+                    <!-- Overview Metrics Header -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+                            <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Total Income</span>
+                            <h3 class="text-2xl font-bold text-emerald-700 dark:text-emerald-300 mt-1" id="budget-total-income">$0.00</h3>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30">
+                            <span class="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase">Total Expenses</span>
+                            <h3 class="text-2xl font-bold text-rose-700 dark:text-rose-300 mt-1" id="budget-total-expenses">$0.00</h3>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30">
+                            <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Remaining Balance</span>
+                            <h3 class="text-2xl font-bold text-indigo-700 dark:text-indigo-300 mt-1" id="budget-net-balance">$0.00</h3>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold dark:text-white">Transactions</h3>
+                        <button onclick="openModal('budget-modal')" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">
+                            + Add Transaction
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Expense Log Table -->
+                        <div class="lg:col-span-2 bg-white dark:bg-pastel-darkCard rounded-2xl border border-slate-100 dark:border-pastel-darkBorder p-4 shadow-sm overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="border-b border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-400 uppercase">
+                                        <th class="py-2 px-3">Type</th>
+                                        <th class="py-2 px-3">Description</th>
+                                        <th class="py-2 px-3">Category</th>
+                                        <th class="py-2 px-3">Amount</th>
+                                        <th class="py-2 px-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="budget-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Chart Expense Category breakdown -->
+                        <div class="bg-white dark:bg-pastel-darkCard rounded-2xl border border-slate-100 dark:border-pastel-darkBorder p-4 shadow-sm flex flex-col justify-center">
+                            <h4 class="font-bold text-sm dark:text-white mb-2 text-center">Expenses Breakdown</h4>
+                            <div class="h-56 relative">
+                                <canvas id="expenseChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. NOTES & JOURNAL MODULE -->
+                <section id="journal" class="tab-content space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold dark:text-white">Journal & Notes</h3>
+                            <p class="text-xs text-slate-500">Reflect on your daily journey and store quick ideas.</p>
+                        </div>
+                        <button onclick="openModal('note-modal')" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">
+                            + New Entry
+                        </button>
+                    </div>
+
+                    <!-- Journal & Notes Grid -->
+                    <div id="journal-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Dynamic Note Cards -->
+                    </div>
+                </section>
+
+                <!-- 9. SETTINGS MODULE -->
+                <section id="settings" class="tab-content space-y-6">
+                    <div class="max-w-4xl space-y-6">
+                        <!-- Customization Settings -->
+                        <div class="bg-white dark:bg-pastel-darkCard p-6 rounded-2xl border border-slate-100 dark:border-pastel-darkBorder shadow-sm space-y-4">
+                            <h3 class="font-bold text-lg dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">Appearance & Personalization</h3>
+                            
+                            <!-- User Profile Setup -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Your Display Name</label>
+                                    <input type="text" id="setting-user-name" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Accent Theme Color</label>
+                                    <div class="flex space-x-3 pt-1">
+                                        <button onclick="changeAccentColor('#8B5CF6')" class="w-7 h-7 rounded-full bg-purple-600 ring-2 ring-offset-2 ring-purple-600"></button>
+                                        <button onclick="changeAccentColor('#EC4899')" class="w-7 h-7 rounded-full bg-pink-500 hover:ring-2 hover:ring-pink-500"></button>
+                                        <button onclick="changeAccentColor('#10B981')" class="w-7 h-7 rounded-full bg-emerald-500 hover:ring-2 hover:ring-emerald-500"></button>
+                                        <button onclick="changeAccentColor('#3B82F6')" class="w-7 h-7 rounded-full bg-blue-500 hover:ring-2 hover:ring-blue-500"></button>
+                                        <button onclick="changeAccentColor('#F59E0B')" class="w-7 h-7 rounded-full bg-amber-500 hover:ring-2 hover:ring-amber-500"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Backup & Reset -->
+                        <div class="bg-white dark:bg-pastel-darkCard p-6 rounded-2xl border border-slate-100 dark:border-pastel-darkBorder shadow-sm space-y-4">
+                            <h3 class="font-bold text-lg dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">Data Management & Backup</h3>
+                            <div class="flex flex-wrap gap-4">
+                                <button onclick="exportPlannerData()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">
+                                    <i class="fa-solid fa-download mr-1"></i> Export Data (JSON)
+                                </button>
+                                <label class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer">
+                                    <i class="fa-solid fa-upload mr-1"></i> Import Data
+                                    <input type="file" id="import-file-input" onchange="importPlannerData(event)" class="hidden" accept=".json">
+                                </label>
+                                <button onclick="openModal('reset-confirm-modal')" class="px-4 py-2 bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-400 rounded-xl text-xs font-semibold hover:bg-rose-100">
+                                    <i class="fa-solid fa-trash mr-1"></i> Reset All Application Data
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Technical Architecture & Integration Information Box -->
+                        <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white space-y-3">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-server text-accent"></i>
+                                <h4 class="font-bold text-base">Backend & Cloud Architecture Guide</h4>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Currently, <strong>My Life Planner</strong> operates locally in your web browser using HTML5 LocalStorage. For multi-device real-time sync, cloud backups, user authentication, and secure monetization:
+                            </p>
+                            <ul class="list-disc list-inside text-xs text-slate-300 space-y-1 pl-2">
+                                <li><strong>User Accounts & Sync:</strong> Integrate Node.js/Firebase Auth to authenticate users and sync tasks to a PostgreSQL/MongoDB database.</li>
+                                <li><strong>Payments Gateway:</strong> Connect Stripe / PayPal API webhooks for upgrading accounts to Premium safely.</li>
+                                <li><strong>Cloud Storage:</strong> Use AWS S3 for saving user uploaded journal attachments or printable PDF templates.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 10. PREMIUM & MONETIZATION HUB MODULE -->
+                <section id="premium" class="tab-content space-y-8">
+                    <!-- Header Banner -->
+                    <div class="text-center max-w-2xl mx-auto space-y-2">
+                        <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold uppercase tracking-wider">Unlock Full Power</span>
+                        <h2 class="text-3xl font-extrabold dark:text-white">Upgrade Your Life Planning Experience</h2>
+                        <p class="text-slate-500 text-sm">Choose the plan that fits your growth and productivity goals.</p>
+                    </div>
+
+                    <!-- Pricing Tables Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                        <!-- Free Tier -->
+                        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shadow-sm">
+                            <div>
+                                <h3 class="font-bold text-lg dark:text-white">Free Starter</h3>
+                                <div class="my-4">
+                                    <span class="text-3xl font-black dark:text-white">$0</span>
+                                    <span class="text-xs text-slate-400">/ forever</span>
+                                </div>
+                                <ul class="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Basic Task & Habit Manager</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Interactive Calendar</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Local Data Storage</li>
+                                    <li class="flex items-center text-slate-400 line-through"><i class="fa-solid fa-xmark text-slate-400 mr-2"></i> Cloud Sync Across Devices</li>
+                                    <li class="flex items-center text-slate-400 line-through"><i class="fa-solid fa-xmark text-slate-400 mr-2"></i> PDF Data Reports Export</li>
+                                </ul>
+                            </div>
+                            <button class="w-full mt-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl font-bold text-xs cursor-default">Current Plan</button>
+                        </div>
+
+                        <!-- Pro Tier (Highlighted) -->
+                        <div class="bg-gradient-to-b from-purple-600 to-indigo-700 text-white rounded-3xl p-6 flex flex-col justify-between shadow-xl relative scale-105">
+                            <span class="absolute -top-3 right-6 bg-amber-400 text-slate-900 text-[10px] font-black px-3 py-1 rounded-full uppercase">Most Popular</span>
+                            <div>
+                                <h3 class="font-bold text-lg">Pro Life Planner</h3>
+                                <div class="my-4">
+                                    <span class="text-3xl font-black">$4.99</span>
+                                    <span class="text-xs text-purple-200">/ month</span>
+                                </div>
+                                <ul class="space-y-3 text-xs text-purple-100">
+                                    <li class="flex items-center"><i class="fa-solid fa-circle-check text-amber-300 mr-2"></i> Everything in Free</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-circle-check text-amber-300 mr-2"></i> Unlimited Goals & Habits</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-circle-check text-amber-300 mr-2"></i> Advanced Productivity Analytics</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-circle-check text-amber-300 mr-2"></i> Cloud Data Sync & Backup</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-circle-check text-amber-300 mr-2"></i> Printable PDF Planner Downloads</li>
+                                </ul>
+                            </div>
+                            <button onclick="openPaymentModal('Pro Life Planner', '$4.99')" class="w-full mt-6 py-2.5 bg-white text-indigo-700 rounded-xl font-bold text-xs shadow-md hover:bg-purple-50 transition-colors">Upgrade to Pro</button>
+                        </div>
+
+                        <!-- VIP Lifetime Tier -->
+                        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shadow-sm">
+                            <div>
+                                <h3 class="font-bold text-lg dark:text-white">VIP Lifetime</h3>
+                                <div class="my-4">
+                                    <span class="text-3xl font-black dark:text-white">$49</span>
+                                    <span class="text-xs text-slate-400">/ pay once</span>
+                                </div>
+                                <ul class="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Lifetime Unlimited Access</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> All Pro Features Included</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Exclusive Custom Pastel Themes</li>
+                                    <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Priority Support & VIP Lounge</li>
+                                </ul>
+                            </div>
+                            <button onclick="openPaymentModal('VIP Lifetime Plan', '$49.00')" class="w-full mt-6 py-2.5 bg-accent text-white rounded-xl font-bold text-xs hover:opacity-90">Get Lifetime VIP</button>
+                        </div>
+                    </div>
+
+                    <!-- Non-Intrusive Advertisement & Affiliate Store Placeholders -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto pt-4">
+                        <!-- Digital Printable Store Preview -->
+                        <div class="p-6 rounded-2xl bg-white dark:bg-pastel-darkCard border border-slate-100 dark:border-pastel-darkBorder shadow-sm space-y-3">
+                            <h4 class="font-bold text-sm dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-print text-accent"></i> Printable Digital Planners
+                            </h4>
+                            <p class="text-xs text-slate-500">Download high-res PDF templates to print or use on your iPad/Tablet app.</p>
+                            <div class="flex items-center space-x-3 pt-2">
+                                <div class="w-16 h-20 bg-pink-100 rounded-lg flex items-center justify-center text-pink-400 font-bold text-xs">A4 PDF</div>
+                                <div class="text-xs">
+                                    <h5 class="font-bold dark:text-white">2026 Ultimate Life Binder</h5>
+                                    <span class="text-slate-400">50+ Pages Printable Kit</span>
+                                    <button class="mt-2 block px-3 py-1 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 rounded-lg text-[10px] font-bold">Download Template</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Affiliate Link Recommendation Area -->
+                        <div class="p-6 rounded-2xl bg-white dark:bg-pastel-darkCard border border-slate-100 dark:border-pastel-darkBorder shadow-sm space-y-3">
+                            <h4 class="font-bold text-sm dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-bag-shopping text-accent"></i> Recommended Tools
+                            </h4>
+                            <p class="text-xs text-slate-500">Handpicked stationery and productivity essentials for your desk setup.</p>
+                            <div class="flex items-center space-x-3 pt-2">
+                                <div class="w-16 h-20 bg-purple-100 rounded-lg flex items-center justify-center text-purple-400 font-bold text-xs">Notebook</div>
+                                <div class="text-xs">
+                                    <h5 class="font-bold dark:text-white">Pastel Hardcover Journal</h5>
+                                    <span class="text-slate-400">Thick paper 160 GSM bullet log</span>
+                                    <a href="#" onclick="alert('Redirecting to partner affiliate link...'); return false;" class="mt-2 inline-block px-3 py-1 bg-amber-500 text-white rounded-lg text-[10px] font-bold">View on Partner Shop</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL DIALOGS -->
+
+    <!-- Quick Add Selector Modal -->
+    <div id="quick-add-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white text-center">Quick Action</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeModal('quick-add-modal'); openTaskModal()" class="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 flex flex-col items-center justify-center hover:bg-purple-100">
+                    <i class="fa-solid fa-list-check text-2xl mb-1"></i>
+                    <span class="text-xs font-bold">New Task</span>
+                </button>
+                <button onclick="closeModal('quick-add-modal'); openModal('goal-modal')" class="p-4 rounded-2xl bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 flex flex-col items-center justify-center hover:bg-pink-100">
+                    <i class="fa-solid fa-bullseye text-2xl mb-1"></i>
+                    <span class="text-xs font-bold">New Goal</span>
+                </button>
+                <button onclick="closeModal('quick-add-modal'); openModal('habit-modal')" class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 flex flex-col items-center justify-center hover:bg-amber-100">
+                    <i class="fa-solid fa-fire text-2xl mb-1"></i>
+                    <span class="text-xs font-bold">New Habit</span>
+                </button>
+                <button onclick="closeModal('quick-add-modal'); openModal('event-modal')" class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 flex flex-col items-center justify-center hover:bg-emerald-100">
+                    <i class="fa-solid fa-calendar-plus text-2xl mb-1"></i>
+                    <span class="text-xs font-bold">New Event</span>
+                </button>
+            </div>
+            <button onclick="closeModal('quick-add-modal')" class="w-full py-2 text-xs font-semibold text-slate-400 hover:text-slate-600">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Task Modal (Create / Edit) -->
+    <div id="task-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white" id="task-modal-title">Add New Task</h3>
+            <form id="task-form" class="space-y-3">
+                <input type="hidden" id="task-edit-id">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Task Title</label>
+                    <input type="text" id="task-title-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Priority</label>
+                        <select id="task-priority-input" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Deadline</label>
+                        <input type="date" id="task-deadline-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('task-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Goal Modal -->
+    <div id="goal-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white">Create Life Goal</h3>
+            <form id="goal-form" class="space-y-3">
+                <input type="hidden" id="goal-edit-id">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Goal Title</label>
+                    <input type="text" id="goal-title-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Description</label>
+                    <textarea id="goal-desc-input" rows="2" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Target Date</label>
+                        <input type="date" id="goal-target-date" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Initial Progress (%)</label>
+                        <input type="number" id="goal-progress-input" min="0" max="100" value="0" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('goal-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">Save Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Habit Modal -->
+    <div id="habit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white">Add Habit Routine</h3>
+            <form id="habit-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Habit Name</label>
+                    <input type="text" id="habit-name-input" placeholder="e.g. Drink 2L Water, Read 20 mins" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('habit-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">Create Habit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="event-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white">Schedule Event</h3>
+            <form id="event-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Event Title</label>
+                    <input type="text" id="event-title-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Event Date</label>
+                        <input type="date" id="event-date-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Time</label>
+                        <input type="time" id="event-time-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('event-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">Save Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Study Modal -->
+    <div id="study-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white">Log Study Session</h3>
+            <form id="study-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Subject Name</label>
+                    <input type="text" id="study-subject-input" placeholder="e.g. Mathematics, History" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Hours Logged</label>
+                        <input type="number" id="study-hours-input" step="0.5" min="0.5" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Target Goal Hours</label>
+                        <input type="number" id="study-target-input" min="1" value="10" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('study-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">Log Study</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Exam Modal -->
+    <div id="exam-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white">Add Exam Schedule</h3>
+            <form id="exam-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Exam Title / Subject</label>
+                    <input type="text" id="exam-title-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Exam Date</label>
+                    <input type="date" id="exam-date-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('exam-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">Save Exam</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Budget Transaction Modal -->
+    <div id="budget-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white">Record Transaction</h3>
+            <form id="budget-form" class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Type</label>
+                        <select id="budget-type-input" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Amount ($)</label>
+                        <input type="number" step="0.01" min="0.01" id="budget-amount-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Description</label>
+                    <input type="text" id="budget-desc-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Category</label>
+                    <select id="budget-cat-input" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                        <option value="Food & Dining">Food & Dining</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Bills & Utilities">Bills & Utilities</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('budget-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">Save Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Note & Journal Modal -->
+    <div id="note-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <h3 class="font-bold text-lg dark:text-white">Journal / Note Entry</h3>
+            <form id="note-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Entry Title</label>
+                    <input type="text" id="note-title-input" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Mood Emoji</label>
+                    <select id="note-mood-input" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent">
+                        <option value="😊 Super Happy">😊 Super Happy</option>
+                        <option value="😌 Calm & Productive">😌 Calm & Productive</option>
+                        <option value="😐 Neutral">😐 Neutral</option>
+                        <option value="😴 Tired">😴 Tired</option>
+                        <option value="🔥 Energetic">🔥 Energetic</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Journal Content</label>
+                    <textarea id="note-content-input" rows="5" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none focus:border-accent"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('note-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-accent text-white rounded-xl text-xs font-semibold hover:opacity-90">Save Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Data Reset Safety Modal -->
+    <div id="reset-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4 text-center">
+            <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 mx-auto flex items-center justify-center text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="font-bold text-lg dark:text-white">Are you absolute sure?</h3>
+            <p class="text-xs text-slate-500">This action will permanently wipe all local storage data, including your tasks, goals, habits, and notes. This cannot be undone.</p>
+            <div class="flex justify-center space-x-2 pt-2">
+                <button type="button" onclick="closeModal('reset-confirm-modal')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold">Cancel</button>
+                <button type="button" onclick="executeDataReset()" class="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-semibold hover:bg-rose-700">Wipe Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulated Payment Gateway Integration Modal -->
+    <div id="payment-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white dark:bg-pastel-darkCard rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 dark:border-pastel-darkBorder space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-base dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-emerald-500"></i> Secure Payment Checkout
+                </h3>
+                <button onclick="closeModal('payment-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl flex justify-between items-center text-xs">
+                <div>
+                    <span class="text-slate-500">Subscribing to:</span>
+                    <h5 class="font-bold dark:text-white text-sm" id="pay-modal-plan-name">Pro Life Planner</h5>
+                </div>
+                <span class="font-extrabold text-accent text-base" id="pay-modal-price">$4.99</span>
+            </div>
+
+            <form id="payment-sim-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Cardholder Name</label>
+                    <input type="text" placeholder="Jane Doe" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Card Number (Simulated)</label>
+                    <input type="text" placeholder="4532 •••• •••• 8892" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Expiry</label>
+                        <input type="text" placeholder="MM/YY" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">CVC</label>
+                        <input type="password" placeholder="123" maxlength="4" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white focus:outline-none">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs hover:bg-emerald-700 transition-colors shadow-md mt-2">
+                    Pay Now & Activate Upgrade
+                </button>
+            </form>
+            <p class="text-[10px] text-center text-slate-400">Integrated with Stripe Sandbox simulation. No real money will be charged.</p>
+        </div>
+    </div>
+
+
+    <!-- COMPLETE JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        /* ==========================================================================
+           GLOBAL APPLICATION STATE & STORAGE ENGINE
+           ========================================================================== */
+        const APP_STORAGE_KEY = 'MY_LIFE_PLANNER_DATA_V1';
+
+        // Default Initial Mock State
+        let state = {
+            user: {
+                name: 'Jane Doe',
+                tier: 'Free Plan',
+                accentColor: '#8B5CF6',
+                darkMode: false
+            },
+            tasks: [
+                { id: '1', title: 'Complete weekly project roadmap', priority: 'high', deadline: '2026-11-15', completed: false },
+                { id: '2', title: 'Morning 30-minute cardio session', priority: 'medium', deadline: '2026-11-12', completed: true },
+                { id: '3', title: 'Buy grocery essentials', priority: 'low', deadline: '2026-11-13', completed: false }
+            ],
+            goals: [
+                { id: '1', title: 'Run a Half Marathon', desc: 'Train consistently every week for endurance', targetDate: '2026-12-31', progress: 45 },
+                { id: '2', title: 'Read 12 Books This Year', desc: 'Read at least 20 pages every night', targetDate: '2026-11-30', progress: 80 }
+            ],
+            habits: [
+                { id: '1', name: 'Drink 2L Water Daily', weekly: [true, true, true, false, true, false, true] },
+                { id: '2', name: 'Meditate 10 Mins', weekly: [true, true, false, true, true, true, false] }
+            ],
+            events: [
+                { id: '1', title: 'Team Sync Meeting', date: '2026-11-12', time: '10:00' },
+                { id: '2', title: 'Doctor Appointment', date: '2026-11-14', time: '14:30' }
+            ],
+            study: [
+                { id: '1', subject: 'Computer Science', hours: 14, target: 20 },
+                { id: '2', subject: 'Financial Accounting', hours: 6, target: 10 }
+            ],
+            exams: [
+                { id: '1', title: 'Algorithms Midterm', date: '2026-11-20' }
+            ],
+            budget: [
+                { id: '1', type: 'income', desc: 'Monthly Salary', amount: 3500, category: 'Salary' },
+                { id: '2', type: 'expense', desc: 'Organic Groceries', amount: 150, category: 'Food & Dining' },
+                { id: '3', type: 'expense', desc: 'Electricity Bill', amount: 85, category: 'Bills & Utilities' }
+            ],
+            notes: [
+                { id: '1', title: 'Reflections on Productive Routines', mood: '😊 Super Happy', content: 'Today was highly focused! Completed all my primary tasks early.', date: '2026-11-11' }
+            ]
+        };
+
+        // Motivational Quotes Database
+        const QUOTES = [
+            { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
+            { text: "Your future is created by what you do today, not tomorrow.", author: "Robert Kiyosaki" },
+            { text: "Action is the foundational key to all success.", author: "Pablo Picasso" },
+            { text: "Small daily improvements over time lead to stunning results.", author: "Robin Sharma" },
+            { text: "Do something today that your future self will thank you for.", author: "Sean Patrick Flanery" }
+        ];
+
+        // Chart References
+        let weeklyChartInstance = null;
+        let expenseChartInstance = null;
+        let calendarCurrentDate = new Date();
+
+        /* ==========================================================================
+           INITIALIZATION & LOCALSTORAGE ENGINE
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStateFromStorage();
+            initAppTheme();
+            initNavigation();
+            initLiveClock();
+            initQuotes();
+            renderAllModules();
+            initCharts();
+            setupFormListeners();
+        });
+
+        function loadStateFromStorage() {
+            const saved = localStorage.getItem(APP_STORAGE_KEY);
+            if (saved) {
+                try {
+                    state = Object.assign({}, state, JSON.parse(saved));
+                } catch (e) {
+                    console.error("Failed to parse localStorage data", e);
+                }
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(state));
+            renderAllModules();
+        }
+
+        /* ==========================================================================
+           THEME & ACCENT PERSONALIZATION
+           ========================================================================== */
+        function initAppTheme() {
+            // Dark mode toggle
+            if (state.user.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+                state.user.darkMode = !state.user.darkMode;
+                document.documentElement.classList.toggle('dark');
+                saveState();
+            });
+
+            // Set user name
+            document.getElementById('sidebar-user-name').textContent = state.user.name;
+            document.getElementById('setting-user-name').value = state.user.name;
+            document.getElementById('welcome-message').textContent = `Good Day, ${state.user.name}!`;
+            document.getElementById('user-tier-badge').textContent = state.user.tier;
+
+            // Apply accent color variable
+            if (state.user.accentColor) {
+                document.documentElement.style.setProperty('--accent-color', state.user.accentColor);
+            }
+        }
+
+        function changeAccentColor(colorHex) {
+            state.user.accentColor = colorHex;
+            document.documentElement.style.setProperty('--accent-color', colorHex);
+            saveState();
+        }
+
+        /* ==========================================================================
+           NAVIGATION & MODAL HANDLERS
+           ========================================================================== */
+        function initNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = link.getAttribute('data-target');
+                    switchTab(target);
+
+                    // Close mobile sidebar if open
+                    document.getElementById('sidebar').classList.add('-translate-x-full');
+                });
+            });
+
+            // Mobile sidebar toggle
+            document.getElementById('open-sidebar-btn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('-translate-x-full');
+            });
+            document.getElementById('close-sidebar-btn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+            });
+
+            // Quick add button
+            document.getElementById('quick-add-btn').addEventListener('click', () => {
+                openModal('quick-add-modal');
+            });
+        }
+
+        function switchTab(targetId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-accent', 'font-bold');
+            });
+
+            const activeTab = document.getElementById(targetId);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+
+            const activeNav = document.querySelector(`.nav-link[data-target="${targetId}"]`);
+            if (activeNav) {
+                activeNav.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-accent', 'font-bold');
+            }
+
+            // Update title header
+            document.getElementById('current-page-title').textContent = targetId.replace('-', ' ');
+
+            // Trigger chart updates if navigating to tabs with charts
+            if (targetId === 'dashboard' || targetId === 'budget') {
+                setTimeout(updateCharts, 50);
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        /* ==========================================================================
+           LIVE CLOCK & MOTIVATIONAL QUOTE ENGINE
+           ========================================================================== */
+        function initLiveClock() {
+            function updateClock() {
+                const now = new Date();
+                document.getElementById('live-clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                document.getElementById('live-date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function initQuotes() {
+            const btn = document.getElementById('new-quote-btn');
+            const quoteText = document.getElementById('quote-text');
+            const quoteAuthor = document.getElementById('quote-author');
+
+            function displayRandomQuote() {
+                const randomIndex = Math.floor(Math.random() * QUOTES.length);
+                const item = QUOTES[randomIndex];
+                quoteText.textContent = `"${item.text}"`;
+                quoteAuthor.textContent = `— ${item.author}`;
+            }
+
+            btn.addEventListener('click', displayRandomQuote);
+        }
+
+        /* ==========================================================================
+           MODULE RENDERERS & DATA COMPUTATION
+           ========================================================================== */
+        function renderAllModules() {
+            renderDashboard();
+            renderTasks();
+            renderGoals();
+            renderHabits();
+            renderCalendar();
+            renderStudyPlanner();
+            renderBudget();
+            renderJournal();
+        }
+
+        /* 1. Dashboard */
+        function renderDashboard() {
+            // Tasks metric
+            const totalTasks = state.tasks.length;
+            const completedTasks = state.tasks.filter(t => t.completed).length;
+            const pct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+            document.getElementById('dash-task-count').textContent = `${completedTasks} / ${totalTasks}`;
+            document.getElementById('dash-task-pct').textContent = `${pct}%`;
+            document.getElementById('dash-task-bar').style.width = `${pct}%`;
+
+            // Goals metric
+            document.getElementById('dash-goals-count').textContent = state.goals.length;
+            const avgGoalProgress = state.goals.length > 0 
+                ? Math.round(state.goals.reduce((acc, g) => acc + Number(g.progress), 0) / state.goals.length)
+                : 0;
+            document.getElementById('dash-goals-avg').textContent = `${avgGoalProgress}%`;
+
+            // Habits streak metric (calculate max streak)
+            let maxStreak = 0;
+            state.habits.forEach(h => {
+                const streak = h.weekly.filter(Boolean).length;
+                if (streak > maxStreak) maxStreak = streak;
+            });
+            document.getElementById('dash-streak-count').textContent = `${maxStreak} Days`;
+
+            // Budget Net
+            const inc = state.budget.filter(b => b.type === 'income').reduce((acc, b) => acc + Number(b.amount), 0);
+            const exp = state.budget.filter(b => b.type === 'expense').reduce((acc, b) => acc + Number(b.amount), 0);
+            document.getElementById('dash-net-balance').textContent = `$${(inc - exp).toFixed(2)}`;
+
+            // Upcoming events
+            const dashEventsContainer = document.getElementById('dash-upcoming-events');
+            dashEventsContainer.innerHTML = '';
+            if (state.events.length === 0) {
+                dashEventsContainer.innerHTML = '<p class="text-xs text-slate-400 italic">No upcoming events scheduled.</p>';
+            } else {
+                state.events.slice(0, 3).forEach(ev => {
+                    const el = document.createElement('div');
+                    el.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/40 text-xs';
+                    el.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 rounded-full bg-accent"></div>
+                            <span class="font-semibold text-slate-800 dark:text-white">${ev.title}</span>
+                        </div>
+                        <span class="text-slate-400 font-medium">${ev.date} at ${ev.time}</span>
+                    `;
+                    dashEventsContainer.appendChild(el);
+                });
+            }
+        }
+
+        /* 2. Tasks Module */
+        function renderTasks() {
+            const container = document.getElementById('tasks-list');
+            container.innerHTML = '';
+
+            const statusFilter = document.getElementById('task-filter-status').value;
+            const priorityFilter = document.getElementById('task-filter-priority').value;
+            const searchQuery = document.getElementById('task-search-input').value.toLowerCase();
+
+            const filteredTasks = state.tasks.filter(t => {
+                const matchesStatus = statusFilter === 'all' || (statusFilter === 'completed' ? t.completed : !t.completed);
+                const matchesPriority = priorityFilter === 'all' || t.priority === priorityFilter;
+                const matchesSearch = t.title.toLowerCase().includes(searchQuery);
+                return matchesStatus && matchesPriority && matchesSearch;
+            });
+
+            if (filteredTasks.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs">No tasks match your criteria.</div>`;
+                return;
+            }
+
+            filteredTasks.forEach(task => {
+                const el = document.createElement('div');
+                el.className = `p-4 flex items-center justify-between transition-colors ${task.completed ? 'bg-slate-50/60 dark:bg-slate-900/40' : 'hover:bg-slate-50/50 dark:hover:bg-slate-800/30'}`;
+                
+                const priorityBadgeClass = task.priority === 'high' 
+                    ? 'bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300'
+                    : task.priority === 'medium'
+                    ? 'bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300'
+                    : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300';
+
+                el.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="toggleTaskStatus('${task.id}')" class="w-4 h-4 rounded text-accent focus:ring-accent cursor-pointer">
+                        <div class="${task.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-white'}">
+                            <h4 class="text-xs font-semibold">${task.title}</h4>
+                            <div class="flex items-center space-x-2 mt-0.5">
+                                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${priorityBadgeClass}">${task.priority}</span>
+                                <span class="text-[10px] text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${task.deadline}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-400">
+                        <button onclick="editTask('${task.id}')" class="p-1 hover:text-accent"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                        <button onclick="deleteTask('${task.id}')" class="p-1 hover:text-rose-500"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function toggleTaskStatus(id) {
+            const task = state.tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveState();
+            }
+        }
+
+        function deleteTask(id) {
+            state.tasks = state.tasks.filter(t => t.id !== id);
+            saveState();
+        }
+
+        function openTaskModal(editId = null) {
+            document.getElementById('task-form').reset();
+            document.getElementById('task-edit-id').value = '';
+            document.getElementById('task-modal-title').textContent = 'Add New Task';
+
+            if (editId) {
+                const task = state.tasks.find(t => t.id === editId);
+                if (task) {
+                    document.getElementById('task-edit-id').value = task.id;
+                    document.getElementById('task-title-input').value = task.title;
+                    document.getElementById('task-priority-input').value = task.priority;
+                    document.getElementById('task-deadline-input').value = task.deadline;
+                    document.getElementById('task-modal-title').textContent = 'Edit Task';
+                }
+            }
+            openModal('task-modal');
+        }
+
+        function editTask(id) {
+            openTaskModal(id);
+        }
+
+        /* 3. Goals Module */
+        function renderGoals() {
+            const grid = document.getElementById('goals-grid');
+            grid.innerHTML = '';
+
+            if (state.goals.length === 0) {
+                grid.innerHTML = '<div class="col-span-full p-8 text-center text-slate-400 text-xs">No active goals yet. Click + Create Goal to get started!</div>';
+                return;
+            }
+
+            state.goals.forEach(goal => {
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-pastel-darkCard p-5 rounded-2xl border border-slate-100 dark:border-pastel-darkBorder shadow-sm flex flex-col justify-between space-y-4';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-sm dark:text-white">${goal.title}</h4>
+                            <div class="flex space-x-1 text-slate-400">
+                                <button onclick="deleteGoal('${goal.id}')" class="p-1 hover:text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${goal.desc || 'No description provided.'}</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-500 mb-1">
+                            <span>Target: ${goal.targetDate}</span>
+                            <span class="font-bold text-accent">${goal.progress}%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden mb-3">
+                            <div class="bg-accent h-full rounded-full transition-all duration-300" style="width: ${goal.progress}%"></div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="range" min="0" max="100" value="${goal.progress}" onchange="updateGoalProgress('${goal.id}', this.value)" class="w-full accent-purple-600 cursor-pointer">
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateGoalProgress(id, val) {
+            const goal = state.goals.find(g => g.id === id);
+            if (goal) {
+                goal.progress = Number(val);
+                saveState();
+            }
+        }
+
+        function deleteGoal(id) {
+            state.goals = state.goals.filter(g => g.id !== id);
+            saveState();
+        }
+
+        /* 4. Habits Module */
+        function renderHabits() {
+            const tbody = document.getElementById('habits-table-body');
+            tbody.innerHTML = '';
+
+            if (state.habits.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-slate-400 text-xs">No daily habits configured yet.</td></tr>';
+                return;
+            }
+
+            state.habits.forEach(habit => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/50 dark:hover:bg-slate-800/30 text-xs';
+                
+                const streakCount = habit.weekly.filter(Boolean).length;
+
+                let checkboxesHtml = '';
+                habit.weekly.forEach((checked, dayIdx) => {
+                    checkboxesHtml += `
+                        <td class="py-3 px-2 text-center">
+                            <input type="checkbox" ${checked ? 'checked' : ''} onclick="toggleHabitDay('${habit.id}', ${dayIdx})" class="w-4 h-4 rounded text-accent focus:ring-accent cursor-pointer">
+                        </td>
+                    `;
+                });
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-semibold dark:text-white">${habit.name}</td>
+                    ${checkboxesHtml}
+                    <td class="py-3 px-4 text-center font-bold text-amber-500">
+                        <i class="fa-solid fa-fire mr-1"></i>${streakCount}/7
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="deleteHabit('${habit.id}')" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleHabitDay(habitId, dayIndex) {
+            const habit = state.habits.find(h => h.id === habitId);
+            if (habit) {
+                habit.weekly[dayIndex] = !habit.weekly[dayIndex];
+                saveState();
+            }
+        }
+
+        function deleteHabit(id) {
+            state.habits = state.habits.filter(h => h.id !== id);
+            saveState();
+        }
+
+        /* 5. Calendar Module */
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            const year = calendarCurrentDate.getFullYear();
+            const month = calendarCurrentDate.getMonth();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('calendar-month-year').textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+
+            // Empty padded cells for first day alignment
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'h-24 p-1 bg-slate-50/40 dark:bg-slate-900/20 rounded-xl border border-transparent';
+                grid.appendChild(emptyCell);
+            }
+
+            // Fill Month Days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+
+                const dayEvents = state.events.filter(e => e.date === formattedDate);
+
+                dayCell.className = `h-24 p-2 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col justify-between transition-colors overflow-hidden ${
+                    isToday ? 'bg-purple-50 dark:bg-purple-950/30 border-accent font-bold' : 'bg-white dark:bg-pastel-darkCard'
+                }`;
+
+                let eventsListHtml = '';
+                dayEvents.forEach(ev => {
+                    eventsListHtml += `<div class="text-[10px] px-1.5 py-0.5 rounded bg-accent text-white truncate my-0.5" title="${ev.title}">${ev.title}</div>`;
+                });
+
+                dayCell.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs ${isToday ? 'text-accent font-bold' : 'text-slate-600 dark:text-slate-300'}">${day}</span>
+                        ${isToday ? '<span class="w-1.5 h-1.5 bg-accent rounded-full"></span>' : ''}
+                    </div>
+                    <div class="overflow-y-auto max-h-14">
+                        ${eventsListHtml}
+                    </div>
+                `;
+                grid.appendChild(dayCell);
+            }
+        }
+
+        document.getElementById('cal-prev-btn').addEventListener('click', () => {
+            calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() - 1);
+            renderCalendar();
+        });
+        document.getElementById('cal-next-btn').addEventListener('click', () => {
+            calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        /* 6. Study Planner Module */
+        function renderStudyPlanner() {
+            const list = document.getElementById('study-subjects-list');
+            list.innerHTML = '';
+
+            if (state.study.length === 0) {
+                list.innerHTML = '<div class="p-6 bg-white dark:bg-pastel-darkCard rounded-2xl text-center text-slate-400 text-xs">No study subjects logged.</div>';
+            } else {
+                state.study.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white dark:bg-pastel-darkCard p-5 rounded-2xl border border-slate-100 dark:border-pastel-darkBorder shadow-sm flex items-center justify-between';
+                    
+                    const pct = Math.min(100, Math.round((item.hours / item.target) * 100));
+
+                    card.innerHTML = `
+                        <div class="flex-1 mr-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="font-bold text-sm dark:text-white">${item.subject}</h4>
+                                <span class="text-xs font-semibold text-slate-500">${item.hours} / ${item.target} Hours</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                                <div class="bg-accent h-full rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                        <button onclick="deleteStudy('${item.id}')" class="text-slate-400 hover:text-rose-500 text-xs p-2"><i class="fa-solid fa-trash"></i></button>
+                    `;
+                    list.appendChild(card);
+                });
+            }
+
+            // Exams render
+            const examsList = document.getElementById('upcoming-exams-list');
+            examsList.innerHTML = '';
+            if (state.exams.length === 0) {
+                examsList.innerHTML = '<p class="text-xs text-slate-400">No exams scheduled.</p>';
+            } else {
+                state.exams.forEach(ex => {
+                    const el = document.createElement('div');
+                    el.className = 'p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40 text-xs flex justify-between items-center';
+                    el.innerHTML = `
+                        <div>
+                            <h5 class="font-bold text-rose-700 dark:text-rose-300">${ex.title}</h5>
+                            <span class="text-[10px] text-slate-500">Date: ${ex.date}</span>
+                        </div>
+                        <button onclick="deleteExam('${ex.id}')" class="text-slate-400 hover:text-rose-600"><i class="fa-solid fa-xmark"></i></button>
+                    `;
+                    examsList.appendChild(el);
+                });
+            }
+        }
+
+        function deleteStudy(id) {
+            state.study = state.study.filter(s => s.id !== id);
+            saveState();
+        }
+
+        function deleteExam(id) {
+            state.exams = state.exams.filter(e => e.id !== id);
+            saveState();
+        }
+
+        /* 7. Budget Planner Module */
+        function renderBudget() {
+            const tbody = document.getElementById('budget-table-body');
+            tbody.innerHTML = '';
+
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            state.budget.forEach(item => {
+                const amt = Number(item.amount);
+                if (item.type === 'income') totalIncome += amt;
+                else totalExpense += amt;
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/50 dark:hover:bg-slate-800/30';
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${item.type === 'income' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${item.type}</span>
+                    </td>
+                    <td class="py-2.5 px-3 font-semibold dark:text-white">${item.desc}</td>
+                    <td class="py-2.5 px-3 text-slate-400">${item.category}</td>
+                    <td class="py-2.5 px-3 font-bold ${item.type === 'income' ? 'text-emerald-600' : 'text-slate-800 dark:text-white'}">$${amt.toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-right">
+                        <button onclick="deleteBudgetItem('${item.id}')" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('budget-total-income').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('budget-total-expenses').textContent = `$${totalExpense.toFixed(2)}`;
+            document.getElementById('budget-net-balance').textContent = `$${(totalIncome - totalExpense).toFixed(2)}`;
+        }
+
+        function deleteBudgetItem(id) {
+            state.budget = state.budget.filter(b => b.id !== id);
+            saveState();
+        }
+
+        /* 8. Notes & Journal Module */
+        function renderJournal() {
+            const grid = document.getElementById('journal-grid');
+            grid.innerHTML = '';
+
+            if (state.notes.length === 0) {
+                grid.innerHTML = '<div class="col-span-full p-8 text-center text-slate-400 text-xs">No notes or journal entries saved.</div>';
+                return;
+            }
+
+            state.notes.forEach(note => {
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-pastel-darkCard p-5 rounded-2xl border border-slate-100 dark:border-pastel-darkBorder shadow-sm flex flex-col justify-between space-y-3';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/40 text-accent font-medium text-[10px]">${note.mood}</span>
+                            <span class="text-[10px] text-slate-400">${note.date}</span>
+                        </div>
+                        <h4 class="font-bold text-sm dark:text-white mt-2">${note.title}</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-1 whitespace-pre-line">${note.content}</p>
+                    </div>
+                    <div class="flex justify-end space-x-2 pt-2 border-t border-slate-50 dark:border-slate-800">
+                        <button onclick="deleteNote('${note.id}')" class="text-slate-400 hover:text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function deleteNote(id) {
+            state.notes = state.notes.filter(n => n.id !== id);
+            saveState();
+        }
+
+        /* ==========================================================================
+           CHARTS INSTANTIATION (Chart.js)
+           ========================================================================== */
+        function initCharts() {
+            // Weekly Productivity Chart
+            const ctxWeekly = document.getElementById('weeklyProductivityChart').getContext('2d');
+            weeklyChartInstance = new Chart(ctxWeekly, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Tasks Completed',
+                        data: [3, 5, 2, 8, 4, 6, 4],
+                        borderColor: '#8B5CF6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(156, 163, 175, 0.1)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Budget Expenses Doughnut Chart
+            const ctxExpense = document.getElementById('expenseChart').getContext('2d');
+            expenseChartInstance = new Chart(ctxExpense, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Food & Dining', 'Bills', 'Shopping', 'Other'],
+                    datasets: [{
+                        data: [150, 85, 45, 20],
+                        backgroundColor: ['#F472B6', '#60A5FA', '#FBBF24', '#34D399']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+                }
+            });
+        }
+
+        function updateCharts() {
+            if (weeklyChartInstance) {
+                weeklyChartInstance.update();
+            }
+            if (expenseChartInstance) {
+                // Compute breakdown dynamically from state
+                const categories = {};
+                state.budget.filter(b => b.type === 'expense').forEach(b => {
+                    categories[b.category] = (categories[b.category] || 0) + Number(b.amount);
+                });
+
+                const labels = Object.keys(categories);
+                const data = Object.values(categories);
+
+                expenseChartInstance.data.labels = labels.length ? labels : ['No Expenses'];
+                expenseChartInstance.data.datasets[0].data = data.length ? data : [1];
+                expenseChartInstance.update();
+            }
+        }
+
+        /* ==========================================================================
+           FORM HANDLERS & MODAL SUBMISSIONS
+           ========================================================================== */
+        function setupFormListeners() {
+            // Task Form
+            document.getElementById('task-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const editId = document.getElementById('task-edit-id').value;
+                const title = document.getElementById('task-title-input').value;
+                const priority = document.getElementById('task-priority-input').value;
+                const deadline = document.getElementById('task-deadline-input').value;
+
+                if (editId) {
+                    const task = state.tasks.find(t => t.id === editId);
+                    if (task) {
+                        task.title = title;
+                        task.priority = priority;
+                        task.deadline = deadline;
+                    }
+                } else {
+                    state.tasks.push({
+                        id: Date.now().toString(),
+                        title,
+                        priority,
+                        deadline,
+                        completed: false
+                    });
+                }
+                closeModal('task-modal');
+                saveState();
+            });
+
+            // Goal Form
+            document.getElementById('goal-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.goals.push({
+                    id: Date.now().toString(),
+                    title: document.getElementById('goal-title-input').value,
+                    desc: document.getElementById('goal-desc-input').value,
+                    targetDate: document.getElementById('goal-target-date').value,
+                    progress: Number(document.getElementById('goal-progress-input').value)
+                });
+                closeModal('goal-modal');
+                saveState();
+            });
+
+            // Habit Form
+            document.getElementById('habit-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.habits.push({
+                    id: Date.now().toString(),
+                    name: document.getElementById('habit-name-input').value,
+                    weekly: [false, false, false, false, false, false, false]
+                });
+                closeModal('habit-modal');
+                saveState();
+            });
+
+            // Event Form
+            document.getElementById('event-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.events.push({
+                    id: Date.now().toString(),
+                    title: document.getElementById('event-title-input').value,
+                    date: document.getElementById('event-date-input').value,
+                    time: document.getElementById('event-time-input').value
+                });
+                closeModal('event-modal');
+                saveState();
+            });
+
+            // Study Session Form
+            document.getElementById('study-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.study.push({
+                    id: Date.now().toString(),
+                    subject: document.getElementById('study-subject-input').value,
+                    hours: Number(document.getElementById('study-hours-input').value),
+                    target: Number(document.getElementById('study-target-input').value)
+                });
+                closeModal('study-modal');
+                saveState();
+            });
+
+            // Exam Form
+            document.getElementById('exam-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.exams.push({
+                    id: Date.now().toString(),
+                    title: document.getElementById('exam-title-input').value,
+                    date: document.getElementById('exam-date-input').value
+                });
+                closeModal('exam-modal');
+                saveState();
+            });
+
+            // Budget Form
+            document.getElementById('budget-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.budget.push({
+                    id: Date.now().toString(),
+                    type: document.getElementById('budget-type-input').value,
+                    amount: Number(document.getElementById('budget-amount-input').value),
+                    desc: document.getElementById('budget-desc-input').value,
+                    category: document.getElementById('budget-cat-input').value
+                });
+                closeModal('budget-modal');
+                saveState();
+            });
+
+            // Note Form
+            document.getElementById('note-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.notes.push({
+                    id: Date.now().toString(),
+                    title: document.getElementById('note-title-input').value,
+                    mood: document.getElementById('note-mood-input').value,
+                    content: document.getElementById('note-content-input').value,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                closeModal('note-modal');
+                saveState();
+            });
+
+            // User Name Settings change listener
+            document.getElementById('setting-user-name').addEventListener('change', (e) => {
+                state.user.name = e.target.value || 'Jane Doe';
+                document.getElementById('sidebar-user-name').textContent = state.user.name;
+                document.getElementById('welcome-message').textContent = `Good Day, ${state.user.name}!`;
+                saveState();
+            });
+
+            // Task filter listeners
+            document.getElementById('task-filter-status').addEventListener('change', renderTasks);
+            document.getElementById('task-filter-priority').addEventListener('change', renderTasks);
+            document.getElementById('task-search-input').addEventListener('input', renderTasks);
+
+            // Payment Form Simulation
+            document.getElementById('payment-sim-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.user.tier = 'Pro Member';
+                saveState();
+                closeModal('payment-modal');
+                alert('Success! Upgrade simulation complete. Welcome to Pro Membership!');
+            });
+        }
+
+        /* ==========================================================================
+           EXPORT, IMPORT, RESET & PAYMENT
+           ========================================================================== */
+        function exportPlannerData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `MyLifePlanner_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importPlannerData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function (e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && imported.tasks) {
+                        state = imported;
+                        saveState();
+                        alert('Data successfully imported!');
+                    } else {
+                        alert('Invalid JSON backup file structure.');
+                    }
+                } catch (err) {
+                    alert('Error parsing JSON backup file.');
+                }
+            };
+            fileReader.readAsText(event.target.files[0]);
+        }
+
+        function executeDataReset() {
+            localStorage.removeItem(APP_STORAGE_KEY);
+            location.reload();
+        }
+
+        function openPaymentModal(planName, price) {
+            document.getElementById('pay-modal-plan-name').textContent = planName;
+            document.getElementById('pay-modal-price').textContent = price;
+            openModal('payment-modal');
+        }
+    </script>
+</body>
+</html>
